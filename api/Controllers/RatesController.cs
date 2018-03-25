@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using rate_api.DataAccess.Abstract;
 using rate_api.Helpers;
@@ -27,13 +29,29 @@ namespace rate_api.Controllers
 
         // POST api/rates
         [HttpPost]
-        public IActionResult Post([FromBody]rate_api.Models.RatesPost rates)
+        public IActionResult Post([FromBody]string rawRates)
         {
+            var rates = RateHelper.DeserializeRates(Request.ContentType, rawRates);
             if (rates != null && rates.rates != null)
             {
-                var parsedRates = RateHelper.ParseNewRates(rates.rates);
-                var numberOfNewRatesAdded = RateHelper.StoreNewRates(parsedRates, _rateRepo);
-                return Ok(numberOfNewRatesAdded);
+                var parsedRates = new List<DataAccess.Models.Rate>();
+                try
+                {
+                    parsedRates = RateHelper.ParseNewRates(rates.rates);
+                }
+                catch
+                {
+                    return BadRequest();
+                }
+                try
+                {
+                    var numberOfNewRatesAdded = RateHelper.StoreNewRates(parsedRates, _rateRepo);
+                    return Ok(numberOfNewRatesAdded + " new rates added");
+                }
+                catch
+                {
+                    return  StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError);
+                }
             }
             return BadRequest();
         }
