@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using rate_api.DataAccess.Abstract;
 using rate_api.Helpers;
 
 namespace rate_api.Controllers
@@ -11,6 +7,11 @@ namespace rate_api.Controllers
     [Route("api/[controller]")]
     public class RatesController : Controller
     {
+        private IRateRepository _rateRepo;
+        public RatesController(IRateRepository rateRepo)
+        {
+            _rateRepo = rateRepo;
+        }
         // GET api/rates/?start=2015-07-01T07:00:00Z&end=2015-07-01T12:00:00Z&format=xml
         [HttpGet]
         public IActionResult Get(string start, string end, string format = "json")
@@ -26,21 +27,15 @@ namespace rate_api.Controllers
 
         // POST api/rates
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]rate_api.Models.RatesPost rates)
         {
-            
-        }
-
-        // PUT api/rates/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/rates/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (rates != null && rates.rates != null)
+            {
+                var parsedRates = RateHelper.ParseNewRates(rates.rates);
+                var numberOfNewRatesAdded = RateHelper.StoreNewRates(parsedRates, _rateRepo);
+                return Ok(numberOfNewRatesAdded);
+            }
+            return BadRequest();
         }
     }
 }

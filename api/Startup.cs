@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using rate_api.DataAccess.Models;
+using rate_api.DataAccess.Abstract;
+using rate_api.DataAccess.Concrete;
 
 namespace rate_api
 {
@@ -26,8 +20,7 @@ namespace rate_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            var connectionString = Configuration.GetConnectionString("RatesDB");
-            services.AddEntityFrameworkNpgsql().AddDbContext<RatesContext>(options => options.UseNpgsql(connectionString));
+            services.AddTransient<IRateRepository, RateRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +30,6 @@ namespace rate_api
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseMvc();
             app.UseDefaultFiles();
             app.UseStaticFiles();
