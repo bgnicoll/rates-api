@@ -4,7 +4,7 @@ This project showcases an API designed to calculate a price of a given date rang
 
 ## Getting Started
 
-These instructions will help get up and running with the rate API on your local machine.
+These instructions will help you get up and running with the rate API on your local machine.
 
 ### Prerequisites
 
@@ -76,7 +76,7 @@ The Rate API has some built-in monitoring functionality. Navigate to http://loca
 
 ## Running the tests
 
-From the /tests directory execute the .NET CLI command to test; the containers do not need to be running in order to execute these tests
+From the /tests directory execute the .NET CLI command to test; if the containers are not running, the integration tests will fail
 
 ```
 dotnet test
