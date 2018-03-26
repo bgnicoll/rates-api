@@ -26,12 +26,19 @@ namespace rate_api.Controllers
             {
                 return BadRequest();
             }
-            var price = RateHelper.CalculatePrice(parsedStartDate.Value, parsedEndDate.Value, _rateRepo);
-            if (price.HasValue)
+            try
             {
-                return Ok(RateHelper.FormatPrice(price.Value));
+                var price = RateHelper.CalculatePrice(parsedStartDate.Value, parsedEndDate.Value, _rateRepo);
+                if (price.HasValue)
+                {
+                    return Json(new {price = RateHelper.FormatPrice(price.Value)});
+                }
+                return Json(new {price = UnavailablePrice});
             }
-            return Ok(UnavailablePrice);
+            catch
+            {
+                return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError);
+            }
         }
 
         // POST api/rates
@@ -54,11 +61,11 @@ namespace rate_api.Controllers
                 try
                 {
                     var numberOfNewRatesAdded = RateHelper.StoreNewRates(parsedRates, _rateRepo);
-                    return Ok(numberOfNewRatesAdded + " new rates added");
+                    return Json(new { newRates = numberOfNewRatesAdded});
                 }
                 catch
                 {
-                    return  StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError);
+                    return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError);
                 }
             }
             return BadRequest();

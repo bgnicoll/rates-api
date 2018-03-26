@@ -1,155 +1,135 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "version": "1.0.0",
-        "title": "Rates API",
-        "license": {
-        "name": "MIT"
-        }
-    },
-    "host": "rates.nicoll.io",
-    "basePath": "/api",
-    "schemes": [
-        "http"
-    ],
-    "consumes": [
-        "application/json",
-        "application/xml"
-    ],
-    "produces": [
-        "application/json",
-        "application/xml"
-    ],
-    "paths": {
-        "/rates": {
-          "get": {
-            "summary": "List all rates",
-            "operationId": "listrates",
-            "tags": [
-              "rates"
-            ],
-            "parameters": [
-              {
-                "name": "limit",
-                "in": "query",
-                "description": "How many items to return at one time (max 100)",
-                "required": false,
-                "type": "integer",
-                "format": "int32"
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "An paged array of rates",
-                "headers": {
-                  "x-next": {
-                    "type": "string",
-                    "description": "A link to the next page of responses"
-                  }
-                },
-                "schema": {
-                  "$ref": "#/definitions/rates"
-                }
-              },
-              "default": {
-                "description": "unexpected error",
-                "schema": {
-                  "$ref": "#/definitions/Error"
-                }
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Rates API",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json",
+    "application/xml"
+  ],
+  "produces": [
+    "application/json",
+    "application/xml"
+  ],
+  "paths": {
+    "/rates": {
+      "get": {
+        "summary": "Calculate a price for a time range",
+        "tags": [
+          "rates"
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date in ISO 8061 format",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date in ISO 8061 format",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The body of the response will contain the price for the requested range or 'unavailable'",
+            "examples": {
+              "application/json": {
+                "price": "1,500"
               }
             }
           },
-          "post": {
-            "summary": "Create a rate",
-            "operationId": "createrates",
-            "tags": [
-              "rates"
-            ],
-            "responses": {
-              "201": {
-                "description": "Null response"
-              },
-              "default": {
-                "description": "unexpected error",
-                "schema": {
-                  "$ref": "#/definitions/Error"
-                }
-              }
-            }
-          }
-        },
-        "/rates/{id}": {
-          "get": {
-            "summary": "Info for a specific rate",
-            "operationId": "showrateById",
-            "tags": [
-              "rates"
-            ],
-            "parameters": [
-              {
-                "name": "rateId",
-                "in": "path",
-                "required": true,
-                "description": "The id of the rate to retrieve",
-                "type": "string"
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "Expected response to a valid request",
-                "schema": {
-                  "$ref": "#/definitions/rates"
-                }
-              },
-              "default": {
-                "description": "unexpected error",
-                "schema": {
-                  "$ref": "#/definitions/Error"
-                }
-              }
-            }
+          "400": {
+            "description": "Bad request. Check dates for formatting errors."
+          },
+          "500": {
+            "description": "Server error. A dependency may be experiencing issues."
           }
         }
       },
-      "definitions": {
-        "Pet": {
-          "required": [
-            "id",
-            "name"
-          ],
-          "properties": {
-            "id": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "name": {
-              "type": "string"
-            },
-            "tag": {
-              "type": "string"
+      "post": {
+        "summary": "Create rates",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rates",
+            "description": "The rates to be added",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/RatesPost"
+              }
             }
           }
-        },
-        "Pets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Pet"
-          }
-        },
-        "Error": {
-          "required": [
-            "code",
-            "message"
-          ],
-          "properties": {
-            "code": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "message": {
-              "type": "string"
+        ],
+        "tags": [
+          "rates"
+        ],
+        "responses": {
+          "200": {
+            "description": "The body of the response will contain information regarding how many new rates were added",
+            "examples": {
+              "application/json": {
+                "newRates": 10
+              }
             }
+          },
+          "400": {
+            "description": "Bad request. Check the request for formatting errors."
+          },
+          "500": {
+            "description": "Server error. A dependency may be experiencing issues."
           }
         }
       }
+    }
+  },
+  "definitions": {
+    "RatesPost": {
+      "type": "object",
+      "properties": {
+        "rates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rate"
+          }
+        }
+      }
+    },
+    "Rate": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "string",
+          "example": "mon,tues,wed,thurs,fri,sat,sun"
+        },
+        "times": {
+          "type": "string",
+          "example": "0600-2000"
+        },
+        "price": {
+          "type": "number",
+          "example": 1500
+        }
+      }
+    }
+  }
 }
