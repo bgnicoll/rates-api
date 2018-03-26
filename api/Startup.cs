@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Prometheus;
 using rate_api.DataAccess.Abstract;
 using rate_api.DataAccess.Concrete;
 
@@ -33,6 +34,7 @@ namespace rate_api
             app.UseMvc();
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseMetricServer();
         }
     }
 }
