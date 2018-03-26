@@ -1,21 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
+
 namespace rate_api.Models
 {
+    [XmlRoot] 
     public class RatesPost
     {
+        [XmlArray("rates")]
         public List<Rate> rates { get; set; }
-        public override bool Equals(object obj)
-        {
-            var ratesPost = obj as RatesPost;
-            if (this.rates == ratesPost.rates)
-            {
-                return true;
-            }
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
     }
 }

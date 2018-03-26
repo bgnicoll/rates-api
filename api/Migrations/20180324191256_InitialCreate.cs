@@ -16,9 +16,9 @@ namespace rateapi.Migrations
                     RateId = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     DayOfWeek = table.Column<string>(nullable: true),
-                    EndTime = table.Column<string>(nullable: true),
-                    Price = table.Column<double>(nullable: false),
-                    StartTime = table.Column<string>(nullable: true)
+                    StartTime = table.Column<int>(nullable: true),
+                    EndTime = table.Column<int>(nullable: true),
+                    Price = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {

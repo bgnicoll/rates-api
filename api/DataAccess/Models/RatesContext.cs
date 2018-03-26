@@ -8,10 +8,7 @@ namespace rate_api.DataAccess.Models
     public class RatesContext : DbContext
     {
         private static IConfiguration Configuration { get; set; }
-        // public RatesContext(DbContextOptions<RatesContext> options)
-        //     : base(options)
-        // { }
-
+        
         public DbSet<Rate> Rates { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

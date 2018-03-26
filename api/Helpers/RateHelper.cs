@@ -7,6 +7,7 @@ using rate_api.Models;
 using Newtonsoft.Json;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace rate_api.Helpers
 {
@@ -27,8 +28,12 @@ namespace rate_api.Helpers
                     {
                         var parsedRate = new rate_api.DataAccess.Models.Rate();
                         parsedRate.DayOfWeek = Enum.GetName(typeof(DayOfWeek), ParseDayOfTheWeek(days[i]));
-                        parsedRate.StartTime = startTime;
-                        parsedRate.EndTime = endTime;
+                        int startTimeParse = 0;
+                        int.TryParse(startTime, out startTimeParse);
+                        parsedRate.StartTime = startTimeParse;
+                        int endTimeParse = 0;
+                        int.TryParse(endTime, out endTimeParse);
+                        parsedRate.EndTime = endTimeParse;
                         parsedRate.Price = rate.price;
                         parsedRates.Add(parsedRate);
                     }
@@ -77,7 +82,7 @@ namespace rate_api.Helpers
                 case "application/xml":
                 case "text/xml":
                     var serializer = new XmlSerializer(typeof(RatesPost));
-                    using (var reader = XmlReader.Create(rawRates))
+                    using (var reader = XmlReader.Create(new StringReader(rawRates)))
                     {
                         rates = (RatesPost)serializer.Deserialize(reader);
                     }
@@ -89,6 +94,32 @@ namespace rate_api.Helpers
                 break;
             }
             return rates;
+        }
+
+        public static double? CalculatePrice(DateTime start, DateTime end, IRateRepository rateRepo)
+        {
+            if (start.DayOfWeek != end.DayOfWeek)
+            {
+                //Requirements and given data indicated time span can not be multiple days
+                return null;
+            }
+
+            var startTime = start.Hour.ToString("D2") + start.Minute.ToString("D2"); 
+            int startTimeAsFourDigitInt = 0;
+            int.TryParse(startTime, out startTimeAsFourDigitInt);
+
+            var endTime = end.Hour.ToString("D2") + end.Minute.ToString("D2");
+            int endTimeAsFourDigitInt = 0;
+            int.TryParse(endTime, out endTimeAsFourDigitInt);
+
+            var price = rateRepo.RetrieveRateForTimeRange(startTimeAsFourDigitInt, endTimeAsFourDigitInt, start.DayOfWeek.ToString());
+            return price;
+        }
+
+        public static string FormatPrice(double price)
+        {
+            var format = price % 1 == 0 ? "#,0" : "#,0.00";
+            return(price.ToString(format));
         }
     }
 }

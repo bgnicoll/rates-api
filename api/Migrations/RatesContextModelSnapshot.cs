@@ -27,11 +27,11 @@ namespace rateapi.Migrations
 
                     b.Property<string>("DayOfWeek");
 
-                    b.Property<string>("EndTime");
+                    b.Property<int>("StartTime");
+
+                    b.Property<int>("EndTime");
 
                     b.Property<double>("Price");
-
-                    b.Property<string>("StartTime");
 
                     b.HasKey("RateId");
 

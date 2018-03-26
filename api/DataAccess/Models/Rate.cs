@@ -5,8 +5,8 @@ namespace rate_api.DataAccess.Models
     {
         public int RateId { get; set; }
         public string DayOfWeek { get; set; }
-        public string StartTime { get; set; }   
-        public string EndTime { get; set; } 
+        public int StartTime { get; set; }   
+        public int EndTime { get; set; } 
         public double Price { get; set; }
 
         public override string ToString()
