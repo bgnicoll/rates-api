@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Prometheus;
 using rate_api.DataAccess.Abstract;
 using rate_api.Helpers;
 using rate_api.Models;
@@ -20,6 +22,13 @@ namespace rate_api.Controllers
         [HttpGet]
         public IActionResult Get(string start, string end)
         {
+            var latencyStopWatch = new Stopwatch();
+            latencyStopWatch.Start();
+            var latencyHistogram = Metrics.CreateHistogram("rate_api_rate_get_request_duration_ms", "Duration of a request to the get endpoint");
+
+            var getRateCounter = Metrics.CreateCounter("rate_api_get_requests_total", "Expresses how often the rates GET endpoint of the rate API is used.");
+            getRateCounter.Inc();
+
             var parsedStartDate = DateHelper.ParseIsoDate(start);
             var parsedEndDate = DateHelper.ParseIsoDate(end);
             if (!parsedStartDate.HasValue || !parsedEndDate.HasValue)
@@ -39,12 +48,19 @@ namespace rate_api.Controllers
             {
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError);
             }
+            finally
+            {
+                latencyStopWatch.Stop();
+                latencyHistogram.Observe(latencyStopWatch.ElapsedMilliseconds);
+            }
         }
 
         // POST api/rates
         [HttpPost]
         public IActionResult Post([FromBody]RatesPost rates)
         {
+            var postRateCounter = Metrics.CreateCounter("rate_api_post_requests_total", "Expresses how often the rates POST endpoint of the rate API is used.");
+            postRateCounter.Inc();
             //var deserializedRates = RateHelper.DeserializeRates(Request.ContentType, rates);
             var deserializedRates = rates;
             if (deserializedRates != null && deserializedRates.rates != null)
