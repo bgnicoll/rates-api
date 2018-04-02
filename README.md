@@ -8,9 +8,9 @@ These instructions will help you get up and running with the rate API on your lo
 
 ### Prerequisites
 
-* [Docker](https://www.docker.com/community-edition)
-* [Docker Compose](https://docs.docker.com/compose/install/)
-* [.NET Core SDK](https://www.microsoft.com/net/download) (this will be used to run database migrations and execute the tests)
+* [Docker](https://www.docker.com/community-edition) (Docker for [Mac](https://www.docker.com/docker-mac) \ [Windows](https://www.docker.com/docker-windows) will cover this requirement)
+* [Docker Compose](https://docs.docker.com/compose/install/)  (Docker for [Mac](https://www.docker.com/docker-mac) \ [Windows](https://www.docker.com/docker-windows) will cover this requirement too)
+* [.NET Core SDK](https://www.microsoft.com/net/download) (this will be used to execute the tests)
 * Not required, but [Postman](https://www.getpostman.com/apps) is recommended for API calls
 
 ### Installing
@@ -32,11 +32,8 @@ Run the containers
 ```
 docker-compose up
 ```
+If you get an error at this step such as "port has already been allocated", the project is trying to use a resource already in use by your computer, try changing up the host port numbers defined in [docker-compose.yml](docker-compose.yml). Consult the [Docker Compose networking documenation](https://docs.docker.com/compose/networking/) for additional information.
 
-If this is your first time running the application, you will need to set up the database tables before using the API. Don't worry! You won't need to install or configure anything special, the database is running inside a container! You can run the migration by opening up another terminal, navigating to the /api directory and running the Entity Framework migrations command
-```
-dotnet ef database update
-```
 Open your browser to http://localhost:8080 to find the [Swagger spec](https://swagger.io/) where you can see the API endpoints, upload new rates and then calculate the price for a time range. You can also use Postman once you get a feel for the API. The example POST data is below
 
 ```json

@@ -6,12 +6,6 @@ namespace Tests
     [TestFixture]
     public class DateHelperTests
     {
-
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void ParseIsoDate_ShouldReturnDateTimeObject()
         {
