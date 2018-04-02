@@ -26,8 +26,4 @@
     <None Include="appsettings.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition=" '$(Configuration)' == 'Debug' ">
-    <Copy SourceFiles="appsettings.Development.json" DestinationFiles="$(OutDir)\appsettings.json" />
-  </Target>
-
 </Project>
