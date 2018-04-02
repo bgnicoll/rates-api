@@ -61,14 +61,13 @@ namespace rate_api.Controllers
         {
             var postRateCounter = Metrics.CreateCounter("rate_api_post_requests_total", "Expresses how often the rates POST endpoint of the rate API is used.");
             postRateCounter.Inc();
-            //var deserializedRates = RateHelper.DeserializeRates(Request.ContentType, rates);
-            var deserializedRates = rates;
-            if (deserializedRates != null && deserializedRates.rates != null)
+
+            if (rates != null && rates.rates != null)
             {
                 var parsedRates = new List<DataAccess.Models.Rate>();
                 try
                 {
-                    parsedRates = RateHelper.ParseNewRates(deserializedRates.rates);
+                    parsedRates = RateHelper.ParseNewRates(rates.rates);
                 }
                 catch
                 {
